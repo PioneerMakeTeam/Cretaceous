@@ -4,7 +4,12 @@ io    =GLOBAL.io
 GetTime=  GLOBAL.GetTime
 GetPlayer=GLOBAL.GetPlayer
 SpawnPrefab = GLOBAL.SpawnPrefab
+TheSim=GLOBAL.TheSim
+TheInput=GLOBAL.TheInput
+math=GLOBAL.math
+
 require 'class'
+require 'constants'
 
 --- 整个Mod的基本类
 -- 定义了整个mod的环境与常用功能
@@ -90,6 +95,102 @@ function TheMod:LoadStringFile()
   end
 end
 
+function TheMod:HasPrefabNear(inst,prefab,radius)
+  local repre
+  local prefabnum=0
+  
+  if inst and inst:IsValid() then
+    local x,y,z = inst.Transform:GetWorldPosition()
+    
+		local ents = TheSim:FindEntities(x,y,z,radius) -- or we could 
+		for k, v in pairs(ents) do
+      
+			if v ~= inst 
+        and v.entity:IsValid() 
+        and v.entity:IsVisible() 
+        and v.prefab==prefab then
+          
+          if not repre then 
+            repre=v
+          end
+          
+          prefabnum=prefabnum+1
+            
+			end
+		end
+	end
+  
+  return repre,prefabnum
+end
 
+
+function TheMod:GetWorldPrefabNum(prefabname)
+  
+  if  not self.player then 
+     self.player=GetPlayer()
+  end
+  
+  local _,num=self:HasPrefabNear(self.player,prefabname,9001)
+  print(prefabname,num)
+  return num or 0
+end
+
+--------------------------------------------------
+-- the key has three mode
+-------------------------------
+-- a c s k
+-- 0 0 0 0
+-- 0 0 1 1
+-- 0 1 0 2
+-- 0 1 1 3
+-- 1 0 0 4
+-- 1 0 1 5
+-- 1 1 0 6
+-- 1 1 1 7 
+---------------------------
+function TheMod:AddKeyClick(key,fn)
+  
+  local has_alt,has_ctrl,has_shift,thekey
+  
+  local KEY_ALT ,KEY_CTRL ,KEY_SHIFT = 400,401 ,402
+  
+  if type(key)=="table" then 
+    if key.key then 
+      thekey=key.key
+      has_alt=key.alt
+      has_ctrl=key.ctrl
+      has_shift=key.shift 
+    else 
+      has_alt=key[1]
+      has_ctrl=key[2]
+      has_shift=key[3]
+      thekey=key[4]
+    end
+  elseif type(key)=="number" and key < 10000 then 
+      thekey=key%1000
+      has_alt= key >= 4000
+      local two=math.floor(key/1000)
+      has_ctrl= two==2 or two==3 or two==6 or two==7 
+      has_shift= two==1 or two==3 or two==5 or two==7 
+  elseif type(key)=="number" then 
+    thekey=key%1000
+    has_alt=math.floor(key/1000)%10 == 1
+    has_ctrl=math.floor(key/10000)%10 == 1
+    has_shift=math.floor(key/100000)%10 == 1
+  end
+  
+  if thekey and thekey>0 then 
+    
+    TheInput:AddKeyDownHandler(thekey,function ()
+        
+        if not((has_alt   and (not TheInput:IsKeyDown(KEY_ALT)))
+            or (has_ctrl  and (not TheInput:IsKeyDown(KEY_CTRL)))
+            or (has_shift and (not TheInput:IsKeyDown(KEY_SHIFT)))) then
+            fn()
+            
+        end
+    end)
+  end
+end
 
 return TheMod

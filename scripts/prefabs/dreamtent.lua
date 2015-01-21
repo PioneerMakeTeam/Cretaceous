@@ -29,8 +29,7 @@ local function OnActivate(inst)
 		inst.components.activatable.inactive = true
 		ProfileStatsSet("portal_rejected", true)
 	end
-
-
+  
 	TheFrontEnd:PushScreen(BigPopupDialogScreen(
       STRINGS.UI.DREAMLOAD.TITLE,
       STRINGS.UI.DREAMLOAD.BODY,
@@ -65,5 +64,6 @@ local function fn(Sim)
   MakeLargePropagator(inst)
   return inst
 end
+
 
 return Prefab( "common/objects/dreamtent", fn, assets)

@@ -3,6 +3,7 @@ io    =GLOBAL.io
 --os    =GLOBAL.os
 GetTime=  GLOBAL.GetTime
 GetPlayer=GLOBAL.GetPlayer
+GetWorld=GLOBAL.GetWorld
 SpawnPrefab = GLOBAL.SpawnPrefab
 TheSim=GLOBAL.TheSim
 TheInput=GLOBAL.TheInput
@@ -191,6 +192,31 @@ function TheMod:AddKeyClick(key,fn)
         end
     end)
   end
+end
+
+function TheMod:RebuildLayer(pt,id)
+  
+  if pt then 
+    
+    local ground = GetWorld()
+    if ground then
+      
+			local original_tile_type = ground.Map:GetTileAtPoint(pt.x, pt.y, pt.z)
+			local x, y = ground.Map:GetTileCoordsAtPoint(pt.x, pt.y, pt.z)
+
+			ground.Map:SetTile( x, y, id)
+			ground.Map:RebuildLayer( original_tile_type, x, y )
+			ground.Map:RebuildLayer( id, x, y )
+			
+			local minimap = TheSim:FindFirstEntityWithTag("minimap")
+			if minimap then
+				minimap.MiniMap:RebuildLayer( original_tile_type, x, y )
+				minimap.MiniMap:RebuildLayer( id, x, y )
+			end  
+			return true
+		end
+	end
+  
 end
 
 return TheMod

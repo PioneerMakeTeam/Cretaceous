@@ -12,7 +12,16 @@ function SimInit(player)
   TheMod:SqawnST2Player("dreamtent")
   TheMod:AddKeyClick(1108,function ()
       TheMod:GetWorldPrefabNum("rabbit")
-      end)
+    end)
+  
+  TheMod:AddKeyClick(1109,function ()
+      print("1109")
+     local x,y,z = player.Transform:GetWorldPosition()
+     print(pt)
+     
+      TheMod:RebuildLayer({x=x,y=y,z=z},25)
+    end)
+  
   
 end
 

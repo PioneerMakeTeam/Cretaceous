@@ -1,4 +1,8 @@
 require=GLOBAL.require
+require 'map/terrain'
+require 'class'
+require 'constants'
+
 io    =GLOBAL.io
 --os    =GLOBAL.os
 GetTime=  GLOBAL.GetTime
@@ -7,10 +11,15 @@ GetWorld=GLOBAL.GetWorld
 SpawnPrefab = GLOBAL.SpawnPrefab
 TheSim=GLOBAL.TheSim
 TheInput=GLOBAL.TheInput
+
+
+
+GROUND = GLOBAL.GROUND
+GROUND_NAMES = GLOBAL.GROUND_NAMES
+
 math=GLOBAL.math
 
-require 'class'
-require 'constants'
+
 
 --- 整个Mod的基本类
 -- 定义了整个mod的环境与常用功能
@@ -35,6 +44,17 @@ TheMod=Class(function (self)
   if self.logfile then 
     
   end
+  
+  
+  self.tile_spec_defaults = {
+    noise_texture = "images/square.tex",
+    runsound = "dontstarve/movement/run_dirt",
+    walksound = "dontstarve/movement/walk_dirt",
+    snowsound = "dontstarve/movement/run_ice",
+    mudsound = "dontstarve/movement/run_mud",
+  }
+  
+  
   
   
 
@@ -86,6 +106,8 @@ end
 
 function TheMod:LoadPrefabsFile()
   self:Require("prefabfiles",true)
+  
+  return self
 end
 
 function TheMod:LoadStringFile()
@@ -94,6 +116,7 @@ function TheMod:LoadStringFile()
   else 
      self:Require("string_en",true)
   end
+  return self
 end
 
 function TheMod:HasPrefabNear(inst,prefab,radius)
@@ -219,4 +242,53 @@ function TheMod:RebuildLayer(pt,id)
   
 end
 
+function TheMod:GetNewTileId()
+  local used = {}
+  
+	for k, v in pairs(GROUND) do
+		used[v] = true
+	end
+  
+	local i = 1
+	while used[i] and i < GROUND.UNDERGROUND do
+		i = i + 1
+	end
+	return i
+end
+
+--------------------------------------
+-- !!!!!!!No Complete-----------------
+-------------------------------------
+function TheMod:AddTile(idname,id,name,specs, minispecs)
+    
+    local specs = specs or {}
+    local minispecs = minispecs or {}
+    
+    if not id or id==0 then 
+      id=self:GetNewTileId()
+    end
+    
+    GROUND[idname] = id
+    GROUND_NAMES[id] = name
+    
+    local real_specs = { name = name }
+    
+    for k, default in pairs(self.tile_spec_defaults) do
+      if specs[k] == nil then
+        real_specs[k] = default
+      else
+        real_specs[k] = specs[k]
+      end
+    end
+    
+end
+    
+function TheMod:AddMemFix()
+  self:Require("memspikefix",true)
+  ApplyMemFixGlobally()
+  
+  return self
+end
+
+  
 return TheMod

@@ -5,7 +5,8 @@ TheMod=TheMod()
 io=GLOBAL.io
 
 TheMod:LoadPrefabsFile()
-TheMod:LoadStringFile()
+      :LoadStringFile()
+      --:AddMemFix()
 
 
 function SimInit(player)

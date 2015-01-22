@@ -286,9 +286,18 @@ end
 function TheMod:AddMemFix()
   self:Require("memspikefix",true)
   ApplyMemFixGlobally()
+  return self
+end
+
+function TheMod:AddLevel(...)
+  self:Require("map/level")
+  self:Require("map/levels")
+  AddLevel(...)
   
   return self
 end
+
+
 
   
 return TheMod

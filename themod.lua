@@ -2,6 +2,7 @@ require=GLOBAL.require
 require 'map/terrain'
 require 'class'
 require 'constants'
+--require "gamelogic"
 
 io    =GLOBAL.io
 --os    =GLOBAL.os
@@ -11,6 +12,8 @@ GetWorld=GLOBAL.GetWorld
 SpawnPrefab = GLOBAL.SpawnPrefab
 TheSim=GLOBAL.TheSim
 TheInput=GLOBAL.TheInput
+RECIPETABS = GLOBAL.RECIPETABS
+Recipes=GLOBAL.Recipes
 
 
 
@@ -29,6 +32,8 @@ TheMod=Class(function (self)
   
 	self.DEBUG=true   --debug模式
 	self.EFFIC=false  --性能优化
+  
+  
   
   self.languagedata=GetModConfigData("Language")
   
@@ -74,6 +79,8 @@ function TheMod:Log(state,logstr)
 		if self.DEBUG and self.EFFIC then
 			self.logfile:flush()
 		end
+  else
+    print(state,logstr)
 	end
 end
 
@@ -296,6 +303,63 @@ function TheMod:AddLevel(...)
   
   return self
 end
+
+function TheMod:StartNewWolrd()
+  local function onsaved()
+		    StartNextInstance({reset_action=RESET_ACTION.LOAD_SLOT, save_slot = SaveGameIndex:GetCurrentSaveSlot()}, true)
+		end  
+		
+		--GetPlayer().sg:GoToState("teleportato_teleport")
+		--ProfileStatsSet("portal_accepted", true)
+		SaveGameIndex:StartAdventure(onsaved) 
+    
+  end
+  
+  
+  function TheMod:RemoveRecipetabs(name)
+    local count
+    
+    if RECIPETABS then 
+      for k,v in pairs(RECIPETABS) do 
+        if k==name then 
+          
+         count= RECIPETABS[k].sort
+         RECIPETABS[k]=nil
+        end
+      end
+    else 
+      self:Log("error","no RECIPETABS ")
+    end
+    
+    for k,v in pairs(Recipes) do 
+      if v.tab.sort == count then 
+        Recipes[k]=nil
+      end
+      
+    end
+    
+    
+    
+    return self
+  end
+  
+  
+function TheMod:FreeBuild()
+
+	
+	if not self.player then
+    self.player=GetPlayer()
+  end
+  
+  if self.player.components.builder.freebuildmode then
+			self.player.components.builder.freebuildmode = false
+  else
+			self.player.components.builder.freebuildmode = true
+  end
+
+		self.player:PushEvent("unlockrecipe")
+end
+
 
 
 

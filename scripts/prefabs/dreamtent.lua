@@ -13,14 +13,9 @@ local function OnActivate(inst)
 	SetPause(true,"portal")
 
 	local function startadventure()
-		local function onsaved()
-		    StartNextInstance({reset_action=RESET_ACTION.LOAD_SLOT, save_slot = SaveGameIndex:GetCurrentSaveSlot()}, true)
-		end
-		TheFrontEnd:PopScreen()
-		SetPause(false)
-		GetPlayer().sg:GoToState("teleportato_teleport")
-		ProfileStatsSet("portal_accepted", true)
-		GetPlayer():DoTaskInTime(5, function() SaveGameIndex:StartAdventure(onsaved) end)
+    TheFrontEnd:PopScreen()
+    SetPause(false)
+    TheMod:StartNewWolrd()
 	end
 
 	local function rejectadventure()

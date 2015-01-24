@@ -1,3 +1,4 @@
 PrefabFiles = {
 	"dreamtent",
+  "dreamtrrebox"
 }

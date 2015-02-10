@@ -10,7 +10,7 @@ require("map/levels")
 
 TheMod=TheMod()
 
-if TheMod.DEBUG then 
+if TheMod.DEBUG then
     GLOBAL.CHEATS_ENABLED=true
     require "debugkeys"
 end
@@ -26,7 +26,7 @@ print(LEVELTYPE)
 TheMod:LoadPrefabsFile()
       :LoadStringFile()
       :AddMemFix()
-      
+
       :RemoveRecipetabs("MAGIC")
       --[[
       :AddLevel(LEVELTYPE.SURVIVAL,{
@@ -41,32 +41,33 @@ TheMod:LoadPrefabsFile()
             "The_Task",
           },
         })]]
-        
+
 
 
 function SimInit(player)
-  
+
   TheMod:SqawnST2Player("dreamtent")
   TheMod:SqawnST2Player("dreamtrrebox")
-  
+ TheMod:SqawnST2Player("bearger")
+
   TheMod:AddKeyClick(1108,function ()
       TheMod:GetWorldPrefabNum("rabbit")
     end)
-  
+
   TheMod:AddKeyClick(2102,function ()
-      
+
   TheMod:FreeBuild()
   end)
-  
+
   TheMod:AddKeyClick(1109,function ()
       print("1109")
      local x,y,z = player.Transform:GetWorldPosition()
      print(pt)
-     
+
       TheMod:RebuildLayer({x=x,y=y,z=z},25)
     end)
-  
-  
+
+
 end
 
 AddSimPostInit(SimInit )

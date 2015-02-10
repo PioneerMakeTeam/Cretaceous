@@ -1,28 +1,34 @@
-require=GLOBAL.require
+-- coding: UTF-8 
+
+--------------------------------------------|*****************|
+GLOBAL.setmetatable(_G, {__index=GLOBAL})---|by: czfshine*****|
+--------------------------------------------|*****************|
+
+do --some require 
+--require=GLOBAL.require
 require 'map/terrain'
 require 'class'
 require 'constants'
 --require "gamelogic"
 
-io    =GLOBAL.io
---os    =GLOBAL.os
-GetTime=  GLOBAL.GetTime
-GetPlayer=GLOBAL.GetPlayer
-GetWorld=GLOBAL.GetWorld
+end
+--[[ DON'T NEED !!!!!!!!!
+do --some Global value
+io          = GLOBAL.io
+--os        = GLOBAL.os
+GetTime     = GLOBAL.GetTime
+GetPlayer   = GLOBAL.GetPlayer
+GetWorld    = GLOBAL.GetWorld
 SpawnPrefab = GLOBAL.SpawnPrefab
-TheSim=GLOBAL.TheSim
-TheInput=GLOBAL.TheInput
-RECIPETABS = GLOBAL.RECIPETABS
-Recipes=GLOBAL.Recipes
-
-
-
-GROUND = GLOBAL.GROUND
-GROUND_NAMES = GLOBAL.GROUND_NAMES
-
-math=GLOBAL.math
-
-
+TheSim      = GLOBAL.TheSim
+TheInput    = GLOBAL.TheInput
+RECIPETABS  = GLOBAL.RECIPETABS
+Recipes     = GLOBAL.Recipes
+GROUND      = GLOBAL.GROUND
+GROUND_NAMES= GLOBAL.GROUND_NAMES
+math        = GLOBAL.math
+end
+--]]
 
 --- 整个Mod的基本类
 -- 定义了整个mod的环境与常用功能
@@ -33,15 +39,13 @@ TheMod=Class(function (self)
 	self.DEBUG=true   --debug模式
 	self.EFFIC=false  --性能优化
   
-  
-  
   self.languagedata=GetModConfigData("Language")
-  
   if self.languagedata==2 then 
     self.ischinese=true 
   else
     self.isenglish=true
   end
+  
   
   self.oldlogstate=""
   self.logfile=io.open("Modlog"..tostring(GetTime())..".txt","wb")
@@ -58,9 +62,6 @@ TheMod=Class(function (self)
     snowsound = "dontstarve/movement/run_ice",
     mudsound = "dontstarve/movement/run_mud",
   }
-  
-  
-  
   
 
 end)
@@ -100,7 +101,7 @@ function TheMod:Require(module_name,import)
 	end
 end
 
-
+--- sqwan something to player
 function TheMod:SqawnST2Player(STname)
   if  not self.player then 
      self.player=GetPlayer()
@@ -113,10 +114,10 @@ end
 
 function TheMod:LoadPrefabsFile()
   self:Require("prefabfiles",true)
-  
   return self
 end
 
+--- the language
 function TheMod:LoadStringFile()
   if self.ischinese then 
      self:Require("string_cn",true)
@@ -126,6 +127,9 @@ function TheMod:LoadStringFile()
   return self
 end
 
+--- find someting  for inst
+--@return repre the first prefabs or nil(not found)
+--@return prefabnum the prefabs count or 0 
 function TheMod:HasPrefabNear(inst,prefab,radius)
   local repre
   local prefabnum=0
@@ -150,11 +154,10 @@ function TheMod:HasPrefabNear(inst,prefab,radius)
 			end
 		end
 	end
-  
   return repre,prefabnum
 end
 
-
+---get how many prefab in the world 
 function TheMod:GetWorldPrefabNum(prefabname)
   
   if  not self.player then 
@@ -166,19 +169,19 @@ function TheMod:GetWorldPrefabNum(prefabname)
   return num or 0
 end
 
---------------------------------------------------
--- the key has three mode
+--[[------------------------------------------------
+-- the key has four mode :)
 -------------------------------
--- a c s k
--- 0 0 0 0
--- 0 0 1 1
--- 0 1 0 2
--- 0 1 1 3
--- 1 0 0 4
--- 1 0 1 5
--- 1 1 0 6
--- 1 1 1 7 
----------------------------
+-- alt ctrl shift   one      two               three                   four 
+-- 0    0     0    0+key  0001+key      {false,false,false,key}   {alt=flase,ctrl=false,shift=false,key=key}  
+-- 0    0     1    1+key  0011+key      {false,false,true,key}    {alt=flase,ctrl=false,shift=true,key=key}   
+-- 0    1     0    2+key  0101+key      {false,true,false,key}    {alt=flase,ctrl=true,shift=false,key=key}   
+-- 0    1     1    3+key  0111+key      {false,true,true,key}     {alt=flase,ctrl=true,shift=true,key=key}    
+-- 1    0     0    4+key  1001+key      {true,false,false,key}    {alt=true,ctrl=false,shift=false,key=key}   
+-- 1    0     1    5+key  1011+key      {true,false,true,key}     {alt=true,ctrl=false,shift=true,key=key}    
+-- 1    1     0    6+key  1101+key      {true,true,false,key}     {alt=true,ctrl=true,shift=false,key=key}    
+-- 1    1     1    7+key  1111+key      {true,true,true,key}      {alt=true,ctrl=true,shift=true,key=key}     
+---------------------------------------------------]]
 function TheMod:AddKeyClick(key,fn)
   
   local has_alt,has_ctrl,has_shift,thekey
@@ -224,6 +227,7 @@ function TheMod:AddKeyClick(key,fn)
   end
 end
 
+---change layer for world 
 function TheMod:RebuildLayer(pt,id)
   
   if pt then 
@@ -263,7 +267,8 @@ function TheMod:GetNewTileId()
 	return i
 end
 
---------------------------------------
+
+--===================================
 -- !!!!!!!No Complete-----------------
 -------------------------------------
 function TheMod:AddTile(idname,id,name,specs, minispecs)
@@ -313,54 +318,51 @@ function TheMod:StartNewWolrd()
 		--ProfileStatsSet("portal_accepted", true)
 		SaveGameIndex:StartAdventure(onsaved) 
     
-  end
+end
   
   
-  function TheMod:RemoveRecipetabs(name)
-    local count
+function TheMod:RemoveRecipetabs(name)
+  local count
     
-    if RECIPETABS then 
-      for k,v in pairs(RECIPETABS) do 
-        if k==name then 
+  if RECIPETABS then 
+    for k,v in pairs(RECIPETABS) do 
+      if k==name then 
           
-         count= RECIPETABS[k].sort
-         RECIPETABS[k]=nil
-        end
+        count= RECIPETABS[k].sort
+        RECIPETABS[k]=nil
       end
-    else 
-      self:Log("error","no RECIPETABS ")
     end
-    
-    for k,v in pairs(Recipes) do 
-      if v.tab.sort == count then 
-        Recipes[k]=nil
-      end
-      
-    end
-    
-    
-    
-    return self
+  else 
+    self:Log("error","no RECIPETABS ")
   end
+    
+  for k,v in pairs(Recipes) do 
+    if v.tab.sort == count then 
+      Recipes[k]=nil
+    end
+  end
+  
+  return self
+end
   
   
 function TheMod:FreeBuild()
-
-	
+  
 	if not self.player then
     self.player=GetPlayer()
   end
-  
-  if self.player.components.builder.freebuildmode then
+  if self.DEBUG then 
+    if self.player.components.builder.freebuildmode then
 			self.player.components.builder.freebuildmode = false
-  else
+    else
 			self.player.components.builder.freebuildmode = true
-  end
-
+    end
 		self.player:PushEvent("unlockrecipe")
+  end
 end
 
-
+function TheMod:AddWand(name)
+  end
 
 
   
